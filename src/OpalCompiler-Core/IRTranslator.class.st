@@ -104,6 +104,12 @@ IRTranslator >> visitBlockReturnTop: blockReturnTop [
 	gen blockReturnTop
 ]
 
+{ #category : 'private' }
+IRTranslator >> visitFFICall: ffiCall [
+
+	^ gen ffiCall: ffiCall
+]
+
 { #category : 'visiting' }
 IRTranslator >> visitInstruction: instr [
 	gen mapBytesTo: instr.

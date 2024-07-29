@@ -38,6 +38,12 @@ FFICalloutMethodBuilder >> argumentNames [
 ]
 
 { #category : 'building' }
+FFICalloutMethodBuilder >> build2: aBlock [
+	aBlock value: self.
+	^ self generate2
+]
+
+{ #category : 'building' }
 FFICalloutMethodBuilder >> build: aBlock [
 	aBlock value: self.
 	^ self generate
@@ -106,6 +112,11 @@ FFICalloutMethodBuilder >> generate [
 ]
 
 { #category : 'private' }
+FFICalloutMethodBuilder >> generate2 [
+	^ self generateMethodFromSpecWithBytecode:(self parseSignature: self signature)
+]
+
+{ #category : 'private' }
 FFICalloutMethodBuilder >> generateFFICallout: builder spec: functionSpec ffiLibrary: ffiLibrary [
 
 	"Builds a method call"
@@ -119,6 +130,47 @@ FFICalloutMethodBuilder >> generateFFICallout: builder spec: functionSpec ffiLib
 	builder send: #invokeWithArguments:.
 	functionSpec arguments do: [ :each | each emitReturnArgument: builder context: sender ].
 	"convert in case return type needs it. And return reseult"
+	^ functionSpec returnType
+		emitReturn: builder
+		resultTempVar: #result
+		context: sender
+		inCallout: self requestor
+]
+
+{ #category : 'private' }
+FFICalloutMethodBuilder >> generateFFICalloutBytecode: builder spec: functionSpec ffiLibrary: ffiLibrary [
+
+	| externalFunction aRunner |
+	TFCalloutAPI isTracing ifTrue: [
+		TFCalloutAPI trace: sender.
+		builder
+			pushLiteral: TFCalloutAPI;
+			pushLiteral: sender;
+			send: #trace: ].
+
+	"iterate arguments in order (in the function) to create the function call"
+	functionSpec arguments
+		do: [ :each |
+			each emitArgument: builder context: sender inCallout: self requestor.
+			each resolvedType tfExternalTypeWithArity emitMarshallToPrimitive: builder ].
+		
+	externalFunction := self createFFICalloutLiteralFromSpec: functionSpec.
+	externalFunction validate. 					
+	aRunner := TFSameThreadRunner uniqueInstance.
+	builder ffiCall: externalFunction withRunner: aRunner.
+	
+	functionSpec arguments withIndexDo: [ :each :index|
+		each emitReturnArgument: builder context: sender.
+		each resolvedType tfExternalTypeWithArity
+			emitFreeIfNeededOfIndex: index
+			argumentsArrayTempName: #argumentsArray
+			withBuilder: builder  ].
+	
+	"Additional marshall in the case of TFFI"
+	functionSpec returnType resolvedType tfExternalTypeWithArity emitMarshallFromPrimitive: builder.
+
+	"convert in case return type needs it. And return reseult"
+
 	^ functionSpec returnType
 		emitReturn: builder
 		resultTempVar: #result
@@ -147,6 +199,34 @@ FFICalloutMethodBuilder >> generateMethodFromSpec: functionSpec [
 
 		ffiLibrary preMethodBuildContext: sender builder: builder spec: functionSpec.
 		r := self generateFFICallout: builder spec: functionSpec ffiLibrary: ffiLibrary.
+		ffiLibrary postMethodBuildContext: sender builder: builder spec: functionSpec.
+		r].
+	method := ir generate.
+	self method isCompiledMethod ifTrue: [method sourcePointer: self method sourcePointer  ].
+	^method
+]
+
+{ #category : 'private' }
+FFICalloutMethodBuilder >> generateMethodFromSpecWithBytecode: functionSpec [
+	| ir ffiLibrary properties method |
+	functionSpec resolveUsing: self requestor.
+
+	ffiLibrary := self extractLibrary.
+
+	ir := IRBuilder buildIR: [ :builder | | r |
+
+		"Copy the properties of the old method"
+		sender methodProperties
+			ifNotNil: [ properties := sender methodProperties copy.
+				properties method: nil.
+				builder properties: properties ].
+
+		builder
+			numArgs: self argumentNames size;
+			addTemps: (self argumentNames copyWith: #result).
+
+		ffiLibrary preMethodBuildContext: sender builder: builder spec: functionSpec.
+		r := self generateFFICalloutBytecode: builder spec: functionSpec ffiLibrary: ffiLibrary.
 		ffiLibrary postMethodBuildContext: sender builder: builder spec: functionSpec.
 		r].
 	method := ir generate.

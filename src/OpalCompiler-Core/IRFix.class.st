@@ -47,6 +47,10 @@ IRFix >> initialize [
 ]
 
 { #category : 'visiting' }
+IRFix >> visitFFICall: anIRFFICall [
+]
+
+{ #category : 'visiting' }
 IRFix >> visitInstruction: instr [
 	self visitNode: instr.
 	prevInstr := instr

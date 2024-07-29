@@ -812,6 +812,60 @@ Object >> explicitRequirement [
 		do: [ self error: 'Explicitly required method' ]
 ]
 
+{ #category : 'newFFI' }
+Object >> ffiCall2: fnSpec [
+	<ffiCalloutTranslator>
+
+	"All the ffiCall: messages are used to perform Foreign-Function calls (FFI calls).
+	FFI calls allows Pharo code to interact with external dynamic linked libraries.
+	Please refer to the booklet about more configuration details
+	or some of the examples on the image LibC / FreeTypeFont / Athens / SDL."
+
+	self ffiCall2: fnSpec library: self ffiLibrary options: #()
+]
+
+{ #category : 'newFFI' }
+Object >> ffiCall2: fnSpec library: aLibrary [
+	<ffiCalloutTranslator>
+
+	self ffiCall2: fnSpec library: aLibrary options: #()
+]
+
+{ #category : 'newFFI' }
+Object >> ffiCall2: fnSpec library: aLibrary fixedArgumentCount: fixedArgumentsCount [
+	<ffiCalloutTranslator>
+
+	"This message allows to call variadic functions.
+	It is required to set the number of fixed arguments in the call as different calling conventions handle them differently"
+
+	self
+		ffiCall2: fnSpec
+		library: aLibrary
+		options: #()
+		fixedArgumentCount: fixedArgumentsCount
+]
+
+{ #category : 'newFFI' }
+Object >> ffiCall2: fnSpec library: aLibrary options: callOptions [
+	<ffiCalloutTranslator>
+
+	"Zero argument count tells it is a not variadic function"
+	^ self ffiCall2: fnSpec library: aLibrary options: callOptions fixedArgumentCount: 0
+]
+
+{ #category : 'newFFI' }
+Object >> ffiCall2: fnSpec library: aLibrary options: callOptions fixedArgumentCount: fixedArgumentsCount [
+	<ffiCalloutTranslator>
+
+	| ffiLibrary |
+	ffiLibrary := aLibrary asFFILibrary.
+	^ (ffiLibrary calloutAPIClass inUFFIContext: thisContext)
+		convention: self ffiCallingConvention;
+		options: (ffiLibrary options), callOptions;
+		fixedArgumentCount: fixedArgumentsCount;
+		function2: fnSpec library: ffiLibrary
+]
+
 { #category : 'finalization' }
 Object >> finalizationRegistry [
 	"Answer the finalization registry associated with the receiver."

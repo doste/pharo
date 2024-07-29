@@ -965,6 +965,21 @@ EncoderForSistaV1 >> genDup [
 ]
 
 { #category : 'bytecode generation' }
+EncoderForSistaV1 >> genFFICallForFunction: literalIndexForFunction withRunner: literalIndexForRunner [
+	"The TFExternalFunction is encoded in the four least significant bits. The Runner is in 
+	four most significant bits"
+	
+	(literalIndexForFunction between: 2r0000 and: 2r1111) ifFalse:
+		[^self outOfRangeError: 'literalIndexForFunction' index: literalIndexForFunction range: 2r0000 to: 2r1111].
+	(literalIndexForRunner between: 2r0000 and: 2r1111) ifFalse:
+		[^self outOfRangeError: 'literalIndexForRunner' index: literalIndexForRunner range: 2r0000 to: 2r1111].
+	
+	stream
+		nextPut: 230;
+		nextPut: ((literalIndexForFunction bitAnd: 2r1111) bitOr: ((literalIndexForRunner bitAnd: 2r1111) << 4))
+]
+
+{ #category : 'bytecode generation' }
 EncoderForSistaV1 >> genJump: distance [
 	(distance > 0 and: [distance < 9]) ifTrue:
 		["176-183	10110 iii			Jump iii + 1 (i.e., 1 through 8)"

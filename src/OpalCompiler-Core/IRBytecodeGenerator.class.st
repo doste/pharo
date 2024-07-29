@@ -229,6 +229,18 @@ IRBytecodeGenerator >> endPrimNumber [
 			ifFalse: [ self quickMethodPrim ]
 ]
 
+{ #category : 'instructions' }
+IRBytecodeGenerator >> ffiCall: ffiFunction [
+	"Pops the arguments and pushes the result"
+	
+	stack pop: ffiFunction externalFunction definition parameterTypes size. 
+	stack push.
+	
+	encoder genFFICallForFunction: (self literalIndexOf: ffiFunction externalFunction) withRunner: (self literalIndexOf: ffiFunction runner)
+	
+	"encoder genFFICall: ffiFunction externalFunction."
+]
+
 { #category : 'accessing' }
 IRBytecodeGenerator >> forceLongForm: aBoolean [
 	forceLongForm := aBoolean

@@ -35,6 +35,15 @@ IRPrinter >> visitBlockReturnTop: blockReturnTop [
 ]
 
 { #category : 'visiting' }
+IRPrinter >> visitFFICall: aFFICall [
+
+	| object |
+	object := aFFICall externalFunction.
+	stream nextPutAll: 'ffiCall: '.
+	object printOn: stream
+]
+
+{ #category : 'visiting' }
 IRPrinter >> visitInstruction: aNode [
 	self visitNode: aNode.
 	stream cr

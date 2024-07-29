@@ -45,6 +45,14 @@ IRInstruction class >> createTempVectorNamed: aTempVectorName withVars: anArray 
 ]
 
 { #category : 'instance creation' }
+IRInstruction class >> ffiCall: anFFIExternalFunction withRunner: aRunner [
+
+	^ IRFFICall new
+		externalFunction: anFFIExternalFunction;
+		runner: aRunner
+]
+
+{ #category : 'instance creation' }
 IRInstruction class >> popTop [
 	^ IRPop new
 ]

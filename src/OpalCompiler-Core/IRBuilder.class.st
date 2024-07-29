@@ -164,6 +164,18 @@ IRBuilder >> currentScope [
 	^currentScope top
 ]
 
+{ #category : 'initialize' }
+IRBuilder >> ffiCall: anFFIExternalFunction [
+
+	self add: (IRInstruction ffiCall: anFFIExternalFunction)
+]
+
+{ #category : 'initialize' }
+IRBuilder >> ffiCall: anFFIExternalFunction withRunner: aRunner [
+
+	self add: (IRInstruction ffiCall: anFFIExternalFunction withRunner: aRunner)
+]
+
 { #category : 'initialization' }
 IRBuilder >> initialize [
 	ir := IRMethod new.
