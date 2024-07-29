@@ -50,6 +50,16 @@ AthensCanvas >> clipBy: aRectangle during: aBlock [
 ]
 
 { #category : 'paths' }
+AthensCanvas >> createPath2: aPathCreatingBlock [
+	"Create new path. A path creating block should be a monadic block,
+	which will get a path builder instance as argument. See AthensPathBuilder
+	for available protocol.
+	The resulting path object can be later used for drawing.
+	"
+	^ surface createPath2: aPathCreatingBlock
+]
+
+{ #category : 'paths' }
 AthensCanvas >> createPath: aPathCreatingBlock [
 	"Create new path. A path creating block should be a monadic block,
 	which will get a path builder instance as argument. See AthensPathBuilder
@@ -77,10 +87,26 @@ AthensCanvas >> draw [
 ]
 
 { #category : 'drawing' }
+AthensCanvas >> draw2 [
+	"Fill the currently selected shape with currently selected paint"
+
+	^ shape paintFillsUsing2: paint on: self
+]
+
+{ #category : 'drawing' }
 AthensCanvas >> draw: anObject [
 	"A generic dispatch method to draw anObject on receiver.
 	the object should understand #drawOnAthensCanvas: message"
 	^ anObject drawOnAthensCanvas: self
+]
+
+{ #category : 'drawing' }
+AthensCanvas >> drawShape2: anObject [
+	"A convenience method, which sets the current shape to anObject and then fills it
+	with currently selected paint"
+	self
+		setShape: anObject;
+		draw2
 ]
 
 { #category : 'drawing' }
@@ -174,6 +200,14 @@ AthensCanvas >> setFont: aFont [
 	"Set the current font of receiver. Font object should answer a glyph renderer instance,
 	compatible with glyph renderer protocol"
 	^ fontRenderer := aFont glyphRendererOn: surface
+]
+
+{ #category : 'paint' }
+AthensCanvas >> setPaint2: aPaint [
+	"set the current paint of receiver"
+	paint = aPaint ifTrue:[ ^ paint ].
+	paint := self paintCache at: aPaint ifAbsentPut: [ aPaint asAthensPaintOn2: self ].
+	^ paint
 ]
 
 { #category : 'paint' }

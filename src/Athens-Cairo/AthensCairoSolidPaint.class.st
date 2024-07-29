@@ -20,6 +20,16 @@ Class {
 }
 
 { #category : 'drawing' }
+AthensCairoSolidPaint >> athensFillPath2: path on: aCanvas [
+
+	aCanvas
+		setSourceR2: r g: g b: b a: a;
+		newPath2;
+		loadPath2: path;
+		fill2
+]
+
+{ #category : 'drawing' }
 AthensCairoSolidPaint >> athensFillPath: path on: aCanvas [
 
 	aCanvas
@@ -27,6 +37,22 @@ AthensCairoSolidPaint >> athensFillPath: path on: aCanvas [
 		newPath;
 		loadPath: path;
 		fill
+]
+
+{ #category : 'drawing' }
+AthensCairoSolidPaint >> athensFillRectangle2: aRect on: aCanvas [
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+	|o e toFillRect|
+	o := origin ifNil:[aRect origin] ifNotNil:[origin].
+	e := extent ifNil:[aRect extent] ifNotNil:[extent].
+	toFillRect := o extent2:e.
+
+	aCanvas
+		setSourceR2: r g: g b: b a: a;
+		newPath2;
+		rectangleX2: toFillRect left y: toFillRect top width: toFillRect width2 height: toFillRect height2;
+		fill2
 ]
 
 { #category : 'drawing' }
@@ -56,6 +82,12 @@ AthensCairoSolidPaint >> color: aColor [
 { #category : 'accessing' }
 AthensCairoSolidPaint >> extent: anExtent [
 	extent := anExtent
+]
+
+{ #category : 'drawing' }
+AthensCairoSolidPaint >> loadOnCairoCanvas2: aCanvas [
+	aCanvas
+		setSourceR2: r g: g b: b a: a
 ]
 
 { #category : 'drawing' }

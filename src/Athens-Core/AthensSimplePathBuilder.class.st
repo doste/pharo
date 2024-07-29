@@ -47,12 +47,47 @@ AthensSimplePathBuilder >> close [
 	open := false
 ]
 
+{ #category : 'path commands' }
+AthensSimplePathBuilder >> close2 [
+	"Close the current contour"
+	self addSegment: (AthensCloseSegment new point: contourStartPt).
+
+	contourStartPt := nil.
+	open := false
+]
+
+{ #category : 'creating path' }
+AthensSimplePathBuilder >> createPath2:	aBlock [
+	"aBlock value: self ...."
+	aBlock value: self.
+
+	^ pathStart
+]
+
 { #category : 'creating path' }
 AthensSimplePathBuilder >> createPath:	aBlock [
 	"aBlock value: self ...."
 	aBlock value: self.
 
 	^ pathStart
+]
+
+{ #category : 'path commands' }
+AthensSimplePathBuilder >> curveVia2: cp1 and: cp2 to: aPoint [
+	"Cubic bezier curve"
+
+	| pt1 pt2 pt3 |
+	"Quad bezier curve"
+
+	pt1 := self toAbsolute: cp1.
+	pt2 := self toAbsolute: cp2.
+	pt3 := self toAbsolute: aPoint.
+	^ self addSegment: (
+		AthensCubicSegment new
+			from: lastSegment endPoint
+			via: pt1
+			and: pt2
+			to: pt3)
 ]
 
 { #category : 'path commands' }
@@ -107,9 +142,30 @@ AthensSimplePathBuilder >> initialize [
 ]
 
 { #category : 'path commands' }
+AthensSimplePathBuilder >> lineTo2: aPoint [
+
+	^ self addSegment: (AthensLineSegment new point: (self toAbsolute: aPoint))
+]
+
+{ #category : 'path commands' }
 AthensSimplePathBuilder >> lineTo: aPoint [
 
 	^ self addSegment: (AthensLineSegment new point: (self toAbsolute: aPoint))
+]
+
+{ #category : 'path commands' }
+AthensSimplePathBuilder >> moveTo2: aPoint [
+	"Move command always starts a new contour "
+	contourStartPt := self toAbsolute: aPoint.
+
+	"Collapse multiple moves to a single one"
+	lastSegment isMove ifTrue: [
+		lastSegment point: contourStartPt.
+		^ self
+	].
+
+	self addSegment: (AthensMoveSegment new point: contourStartPt; reopen: open).
+	open := true
 ]
 
 { #category : 'path commands' }

@@ -21,7 +21,20 @@ AthensPolygon >> finish [
 ]
 
 { #category : 'converting' }
+AthensPolygon >> lineTo2: aPoint [
+	currentContour add: aPoint
+]
+
+{ #category : 'converting' }
 AthensPolygon >> lineTo: aPoint [
+	currentContour add: aPoint
+]
+
+{ #category : 'converting' }
+AthensPolygon >> moveTo2: aPoint [
+	" create a new contour "
+
+	self newContour.
 	currentContour add: aPoint
 ]
 
@@ -38,6 +51,14 @@ AthensPolygon >> newContour [
 	contours ifNil: [ contours := OrderedCollection new ].
 
 	currentContour := contours add: OrderedCollection new
+]
+
+{ #category : 'drawing' }
+AthensPolygon >> paintFillsUsing2: aPaint on: anAthensCanvas [
+
+	"This method is a part of rendering dispatch  Canvas->receiver->paint"
+
+	^ aPaint fillPolygon: self on: anAthensCanvas
 ]
 
 { #category : 'drawing' }

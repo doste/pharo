@@ -19,6 +19,19 @@ AthensCompositeStrokePaint >> asStrokePaintOn: aCanvas [
 ]
 
 { #category : 'drawing' }
+AthensCompositeStrokePaint >> athensFillRectangle2: aRect on: anAthensCanvas [
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+
+	| r |
+	r := aRect.
+	strokePaints
+		do: [ :paint |
+			paint athensFillRectangle2: r on: anAthensCanvas.
+			withInset ifTrue:[r := r insetBy: paint width ]]
+]
+
+{ #category : 'drawing' }
 AthensCompositeStrokePaint >> athensFillRectangle: aRect on: anAthensCanvas [
 	"This is a terminal method in rendering dispatch scheme
 	canvas->shape->paint. See AthensCanvas>>fillShape: "

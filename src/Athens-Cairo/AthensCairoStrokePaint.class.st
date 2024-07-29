@@ -21,6 +21,17 @@ Class {
 }
 
 { #category : 'drawing' }
+AthensCairoStrokePaint >> athensFillPath2: aPath on: aCanvas [
+
+	self prepareForDrawingOn2: aCanvas.
+
+	aCanvas
+		newPath2;
+		loadPath2: aPath;
+		stroke2
+]
+
+{ #category : 'drawing' }
 AthensCairoStrokePaint >> athensFillPath: aPath on: aCanvas [
 
 	self prepareForDrawingOn: aCanvas.
@@ -29,6 +40,20 @@ AthensCairoStrokePaint >> athensFillPath: aPath on: aCanvas [
 		newPath;
 		loadPath: aPath;
 		stroke
+]
+
+{ #category : 'drawing' }
+AthensCairoStrokePaint >> athensFillRectangle2: aRect on: aCanvas [
+
+	self prepareForDrawingOn2: aCanvas.
+
+	aCanvas
+		newPath2;
+		rectangleX2: aRect left
+		y: aRect top
+		width: aRect width
+		height: aRect height;
+		stroke2
 ]
 
 { #category : 'drawing' }
@@ -82,6 +107,22 @@ AthensCairoStrokePaint >> joinRound [
 ]
 
 { #category : 'private' }
+AthensCairoStrokePaint >> prepareForDrawingOn2: aCanvas [
+
+	fillPaint
+		loadOnCairoCanvas2: aCanvas.
+
+	aCanvas
+		primSetLineWidth2: width asFloat;
+		primSetLineJoin2: joinStyle;
+		primSetLineCap2: capStyle.
+
+	dashLenghts
+		ifNil: [ aCanvas resetDash2 ]
+		ifNotNil: [ self setDashesOn2: aCanvas ]
+]
+
+{ #category : 'private' }
 AthensCairoStrokePaint >> prepareForDrawingOn: aCanvas [
 
 	fillPaint
@@ -130,6 +171,23 @@ AthensCairoStrokePaint >> primSetLineWidthOn: aCanvas [
 	^ self ffiCall: #(void cairo_set_line_width (
 				AthensCairoCanvas aCanvas,
 				double width) )
+]
+
+{ #category : 'private' }
+AthensCairoStrokePaint >> setDashesOn2: aCanvas [
+	| buf |
+
+	buf := ByteArray new: 8*dashLenghts size.
+
+	dashLenghts withIndexDo: [:len :i |
+
+		buf doubleAt: (i-1)*8 + 1 put: len asFloat
+		].
+
+	aCanvas
+		primSetDashesLengths2: buf
+		count: dashLenghts size
+		offset: dashOffset
 ]
 
 { #category : 'private' }

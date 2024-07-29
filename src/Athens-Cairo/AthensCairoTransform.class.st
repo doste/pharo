@@ -30,9 +30,28 @@ AthensCairoTransform >> loadIdentity [
 		void cairo_identity_matrix (AthensCairoCanvas canvas) )
 ]
 
+{ #category : 'primitives' }
+AthensCairoTransform >> loadIdentity2 [
+	^ self ffiCall2: #(
+		void cairo_identity_matrix (AthensCairoCanvas canvas) )
+]
+
+{ #category : 'transformations' }
+AthensCairoTransform >> moveTo2: aPoint [
+	self moveToX2: aPoint x asFloat Y: aPoint y asFloat
+]
+
 { #category : 'transformations' }
 AthensCairoTransform >> moveTo: aPoint [
 	self moveToX: aPoint x asFloat Y: aPoint y asFloat
+]
+
+{ #category : 'primitives' }
+AthensCairoTransform >> moveToX2: px Y: py [
+	^ self ffiCall2: #(
+		void cairo_move_to (AthensCairoCanvas canvas,
+                                                         double px,
+                                                         double py))
 ]
 
 { #category : 'primitives' }
@@ -48,6 +67,14 @@ AthensCairoTransform >> primRotateByRadians: angle [
 	^ self ffiCall: #(
 		void cairo_rotate (AthensCairoCanvas canvas,
                                                          double angle))
+]
+
+{ #category : 'primitives' }
+AthensCairoTransform >> primScaleX2: fx Y: fy [
+	^ self ffiCall2: #(
+		void cairo_scale (AthensCairoCanvas canvas,
+                                                         double fx,
+                                                         double fy))
 ]
 
 { #category : 'primitives' }
@@ -67,6 +94,15 @@ AthensCairoTransform >> primTransformX: x Y: y [
 ]
 
 { #category : 'primitives' }
+AthensCairoTransform >> primTranslateX2: px Y: py [
+
+	^ self ffiCall2: #(
+		void cairo_translate (AthensCairoCanvas canvas,
+                                                         double px,
+                                                         double py))
+]
+
+{ #category : 'primitives' }
 AthensCairoTransform >> primTranslateX: px Y: py [
 
 	^ self ffiCall: #(
@@ -78,6 +114,17 @@ AthensCairoTransform >> primTranslateX: px Y: py [
 { #category : 'primitives' }
 AthensCairoTransform >> restore [
 	^ self ffiCall: #(void cairo_restore(AthensCairoCanvas canvas))
+]
+
+{ #category : 'primitives' }
+AthensCairoTransform >> restore2 [
+	^ self ffiCall2: #(void cairo_restore(AthensCairoCanvas canvas))
+]
+
+{ #category : 'transformations' }
+AthensCairoTransform >> restoreAfter2: aBlock [
+	self save2.
+	aBlock ensure:  [ self restore2 ]
 ]
 
 { #category : 'transformations' }
@@ -103,6 +150,24 @@ AthensCairoTransform >> save [
 	^ self ffiCall: #(void cairo_save (AthensCairoCanvas canvas))
 ]
 
+{ #category : 'primitives' }
+AthensCairoTransform >> save2 [
+	^ self ffiCall2: #(void cairo_save (AthensCairoCanvas canvas))
+]
+
+{ #category : 'transformations' }
+AthensCairoTransform >> scaleBy2: aScalarOrPoint [
+	| double |
+	aScalarOrPoint isPoint
+		ifTrue:[
+			self
+				scaleX2: aScalarOrPoint x asFloat
+				Y: aScalarOrPoint y asFloat ]
+		ifFalse:[
+			double := aScalarOrPoint asFloat.
+			self scaleX2: double Y: double ]
+]
+
 { #category : 'transformations' }
 AthensCairoTransform >> scaleBy: aScalarOrPoint [
 	| double |
@@ -114,6 +179,12 @@ AthensCairoTransform >> scaleBy: aScalarOrPoint [
 		ifFalse:[
 			double := aScalarOrPoint asFloat.
 			self scaleX: double Y: double ]
+]
+
+{ #category : 'transformation' }
+AthensCairoTransform >> scaleX2: fx Y: fy [
+
+	^ self primScaleX2: fx asFloat Y: fy asFloat
 ]
 
 { #category : 'transformation' }
@@ -136,6 +207,12 @@ AthensCairoTransform >> transform: aPoint [
 { #category : 'transformations' }
 AthensCairoTransform >> translateBy: aPoint [
 	self translateX: aPoint x Y: aPoint y
+]
+
+{ #category : 'primitives' }
+AthensCairoTransform >> translateX2: px Y: py [
+
+	^ self primTranslateX2: px asFloat Y: py asFloat
 ]
 
 { #category : 'primitives' }

@@ -360,6 +360,11 @@ AthensCanvasWrapper >> flush [
 	^ self canvas surface flush
 ]
 
+{ #category : 'canvas drawing - support' }
+AthensCanvasWrapper >> flush2 [
+	^ self canvas surface flush2
+]
+
 { #category : 'accessing' }
 AthensCanvasWrapper >> form [
 	^ self canvas surface asForm

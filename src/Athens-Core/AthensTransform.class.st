@@ -66,6 +66,12 @@ AthensTransform >> invert [
 	self subclassResponsibility
 ]
 
+{ #category : 'transformations' }
+AthensTransform >> invert2 [
+	"I should invert"
+	self subclassResponsibility
+]
+
 { #category : 'testing' }
 AthensTransform >> isAffineTransform [
 	^ self subclassResponsibility
@@ -77,12 +83,23 @@ AthensTransform >> isIdentity [
 ]
 
 { #category : 'transformations' }
+AthensTransform >> loadAffineTransform2: anAthenTransform [
+	self subclassResponsibility
+]
+
+{ #category : 'transformations' }
 AthensTransform >> loadAffineTransform: anAthenTransform [
 	self subclassResponsibility
 ]
 
 { #category : 'transformations' }
 AthensTransform >> loadIdentity [
+	"Load the identity matrix into receiver"
+	self subclassResponsibility
+]
+
+{ #category : 'transformations' }
+AthensTransform >> loadIdentity2 [
 	"Load the identity matrix into receiver"
 	self subclassResponsibility
 ]
@@ -106,7 +123,19 @@ AthensTransform >> rotateByRadians: angle [
 ]
 
 { #category : 'transformations' }
+AthensTransform >> scaleBy2: factor [
+
+	self subclassResponsibility
+]
+
+{ #category : 'transformations' }
 AthensTransform >> scaleBy: factor [
+
+	self subclassResponsibility
+]
+
+{ #category : 'transformations' }
+AthensTransform >> scaleX2: fx Y: fy [
 
 	self subclassResponsibility
 ]
@@ -139,6 +168,12 @@ AthensTransform >> transformX: px Y: py [
 
 { #category : 'transformations' }
 AthensTransform >> translateBy: aPoint [
+
+	self subclassResponsibility
+]
+
+{ #category : 'transformations' }
+AthensTransform >> translateX2: px Y: py [
 
 	self subclassResponsibility
 ]

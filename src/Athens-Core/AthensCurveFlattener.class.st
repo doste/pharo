@@ -48,6 +48,31 @@ AthensCurveFlattener >> curveCollinearityEpsilon [
 ]
 
 { #category : 'path commands' }
+AthensCurveFlattener >> curveVia2: via1 and: via2 to: end [
+	| pt1 pt2 pt3 pt4 curve |
+
+	pt1 := transform transform: endPoint.
+	pt2 := transform transform: via1.
+	pt3 := transform transform: via2.
+	pt4 := transform transform: end.
+
+	endPoint := end.
+
+	curve := AthensCubicBezier new
+		x1: pt1 x;
+		y1: pt1 y;
+		x2: pt2 x;
+		y2: pt2 y;
+		x3: pt3 x;
+		y3: pt3 y;
+		x4: pt4 x;
+		y4: pt4 y.
+
+	curve recursiveSubDiv2: self level: 0.
+	self lineTo2: endPoint
+]
+
+{ #category : 'path commands' }
 AthensCurveFlattener >> curveVia: via1 and: via2 to: end [
 	| pt1 pt2 pt3 pt4 curve |
 
@@ -255,6 +280,14 @@ AthensCurveFlattener >> lengthToleranceSquared [
 ]
 
 { #category : 'path commands' }
+AthensCurveFlattener >> lineTo2: aPoint [
+
+	endPoint := aPoint.
+
+	^ dest lineTo2: aPoint
+]
+
+{ #category : 'path commands' }
 AthensCurveFlattener >> lineTo: aPoint [
 
 	endPoint := aPoint.
@@ -266,6 +299,14 @@ AthensCurveFlattener >> lineTo: aPoint [
 AthensCurveFlattener >> lineToX: trX y: trY [
 
 	^ dest lineTo: (self inverseTransform: trX @ trY)
+]
+
+{ #category : 'path commands' }
+AthensCurveFlattener >> moveTo2: aPoint [
+
+	contourStartPt := endPoint := aPoint.
+
+	^ dest moveTo2: aPoint
 ]
 
 { #category : 'path commands' }

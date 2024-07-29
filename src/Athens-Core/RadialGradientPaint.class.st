@@ -23,6 +23,15 @@ Class {
 }
 
 { #category : 'converting' }
+RadialGradientPaint >> asAthensPaintOn2: aCanvas [
+	^ aCanvas surface
+		createRadialGradient2:  colorRamp
+		center: center
+		radius: radius
+		focalPoint: focalPoint
+]
+
+{ #category : 'converting' }
 RadialGradientPaint >> asAthensPaintOn: aCanvas [
 	^ aCanvas surface
 		createRadialGradient:  colorRamp

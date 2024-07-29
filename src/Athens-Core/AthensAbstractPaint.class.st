@@ -20,6 +20,11 @@ AthensAbstractPaint class >> isAbstract [
 ]
 
 { #category : 'converting' }
+AthensAbstractPaint >> asAthensPaintOn2: aCanvas [
+	^ self
+]
+
+{ #category : 'converting' }
 AthensAbstractPaint >> asAthensPaintOn: aCanvas [
 	^ self
 ]

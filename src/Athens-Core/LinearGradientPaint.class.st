@@ -29,6 +29,14 @@ LinearGradientPaint class >> from: aStartPoint  to: aStopPoint [
 ]
 
 { #category : 'converting' }
+LinearGradientPaint >> asAthensPaintOn2: aCanvas [
+	^ aCanvas surface
+			createLinearGradient2: self colorRamp
+				start: self start
+				stop: self stop
+]
+
+{ #category : 'converting' }
 LinearGradientPaint >> asAthensPaintOn: aCanvas [
 	^ aCanvas surface
 			createLinearGradient: self colorRamp

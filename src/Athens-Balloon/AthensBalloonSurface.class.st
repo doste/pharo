@@ -21,10 +21,25 @@ Class {
 }
 
 { #category : 'instance creation' }
+AthensBalloonSurface class >> extent2: aPoint [
+	"Create a new surface with given extent."
+
+	^ self new form: (Form extent: aPoint depth: 32)
+]
+
+{ #category : 'instance creation' }
 AthensBalloonSurface class >> extent: aPoint [
 	"Create a new surface with given extent."
 
 	^ self new form: (Form extent: aPoint depth: 32)
+]
+
+{ #category : 'converting' }
+AthensBalloonSurface >> asAthensPaintOn2: aCanvas [
+
+	^ AthensBalloonImagePaint new
+		  form: self asForm;
+		  yourself
 ]
 
 { #category : 'converting' }
@@ -43,6 +58,12 @@ AthensBalloonSurface >> asForm [
 
 { #category : 'public' }
 AthensBalloonSurface >> clear [
+
+	^ self clearForm
+]
+
+{ #category : 'public' }
+AthensBalloonSurface >> clear2 [
 
 	^ self clearForm
 ]
@@ -71,6 +92,16 @@ AthensBalloonSurface >> clipRect [
 ]
 
 { #category : 'paints' }
+AthensBalloonSurface >> createCircularGradient2: colorRamp center: aCenter radius: aRadius [
+
+	^ AthensBalloonRadialGradient new
+		colorRamp: colorRamp;
+		center: aCenter;
+		radius: aRadius;
+		yourself
+]
+
+{ #category : 'paints' }
 AthensBalloonSurface >> createCircularGradient: colorRamp center: aCenter radius: aRadius [
 
 	^ AthensBalloonRadialGradient new
@@ -87,6 +118,16 @@ AthensBalloonSurface >> createFormPaint: aForm [
 ]
 
 { #category : 'paints' }
+AthensBalloonSurface >> createLinearGradient2: colorRamp start: pt1 stop: pt2 [
+
+	^ AthensBalloonLinearGradient new
+		colorRamp: colorRamp;
+		origin: pt1;
+		corner: pt2;
+		yourself
+]
+
+{ #category : 'paints' }
 AthensBalloonSurface >> createLinearGradient: colorRamp start: pt1 stop: pt2 [
 
 	^ AthensBalloonLinearGradient new
@@ -94,6 +135,17 @@ AthensBalloonSurface >> createLinearGradient: colorRamp start: pt1 stop: pt2 [
 		origin: pt1;
 		corner: pt2;
 		yourself
+]
+
+{ #category : 'paths' }
+AthensBalloonSurface >> createPath2: aPathCreatingBlock [
+	"Create a path from provided path builder instance"
+
+	| builder |
+	builder := AthensSimplePathBuilder new.
+	aPathCreatingBlock value: builder.
+
+	^ AthensBalloonPath new convertFromBuilder: builder
 ]
 
 { #category : 'paths' }

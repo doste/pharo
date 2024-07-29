@@ -22,6 +22,14 @@ AthensQuartzSurface class >> finalizeResourceData: data [
 ]
 
 { #category : 'primitives' }
+AthensQuartzSurface class >> primImage2: aFormat width: aWidth height: aHeight [
+"Creates a Quartz surface backed by a CGBitmap. The surface is created using the Device RGB (or Device Gray, for A8) color space. All Cairo operations, including those that require software rendering, will succeed on this surface. "
+	^ self ffiCall2: #(AthensQuartzSurface  cairo_quartz_surface_create (int aFormat,
+                                                         int aWidth,
+                                                         int aHeight) )
+]
+
+{ #category : 'primitives' }
 AthensQuartzSurface class >> primImage: aFormat width: aWidth height: aHeight [
 "Creates a Quartz surface backed by a CGBitmap. The surface is created using the Device RGB (or Device Gray, for A8) color space. All Cairo operations, including those that require software rendering, will succeed on this surface. "
 	^ self ffiCall: #(AthensQuartzSurface  cairo_quartz_surface_create (int aFormat,

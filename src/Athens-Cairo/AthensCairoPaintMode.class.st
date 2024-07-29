@@ -83,6 +83,15 @@ AthensCairoPaintMode >> clear [
 ]
 
 { #category : 'modes' }
+AthensCairoPaintMode >> clear2 [
+	"Set 'clear' drawing mode.
+
+	Drawing under this mode will clear the surface under the shape boundaries"
+
+	^ self setOperator2: CAIRO_OPERATOR_CLEAR
+]
+
+{ #category : 'modes' }
 AthensCairoPaintMode >> colorBurn [
 
 	^ self setOperator: CAIRO_OPERATOR_COLOR_BURN
@@ -148,6 +157,12 @@ AthensCairoPaintMode >> exclusion [
 { #category : 'private' }
 AthensCairoPaintMode >> getOperator [
 	^ self ffiCall: #(
+		cairo_operator_t cairo_get_operator (AthensCairoCanvas canvas) )
+]
+
+{ #category : 'private' }
+AthensCairoPaintMode >> getOperator2 [
+	^ self ffiCall2: #(
 		cairo_operator_t cairo_get_operator (AthensCairoCanvas canvas) )
 ]
 
@@ -221,6 +236,14 @@ AthensCairoPaintMode >> overlay [
 ]
 
 { #category : 'convenience' }
+AthensCairoPaintMode >> restoreAfter2: aBlock [
+	| op |
+	op := self getOperator2.
+
+	aBlock ensure: [ self setOperator2: op ]
+]
+
+{ #category : 'convenience' }
 AthensCairoPaintMode >> restoreAfter: aBlock [
 	| op |
 	op := self getOperator.
@@ -241,6 +264,11 @@ AthensCairoPaintMode >> screen [
 ]
 
 { #category : 'private' }
+AthensCairoPaintMode >> setOperator2: aCairoOperatorT [
+	^ self ffiCall2: #(void cairo_set_operator (AthensCairoCanvas canvas, cairo_operator_t aCairoOperatorT) )
+]
+
+{ #category : 'private' }
 AthensCairoPaintMode >> setOperator: aCairoOperatorT [
 	^ self ffiCall: #(void cairo_set_operator (AthensCairoCanvas canvas, cairo_operator_t aCairoOperatorT) )
 ]
@@ -258,6 +286,15 @@ AthensCairoPaintMode >> source [
 	Drawing under this mode will replace the content with incoming source under the shape boundaries"
 
 	^ self setOperator: CAIRO_OPERATOR_SOURCE
+]
+
+{ #category : 'modes' }
+AthensCairoPaintMode >> source2 [
+	"Set 'source' drawing mode.
+
+	Drawing under this mode will replace the content with incoming source under the shape boundaries"
+
+	^ self setOperator2: CAIRO_OPERATOR_SOURCE
 ]
 
 { #category : 'modes' }

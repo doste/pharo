@@ -30,6 +30,19 @@ AthensBorderStrokePaint >> asStrokePaintOn: aCanvas [
 ]
 
 { #category : 'drawing' }
+AthensBorderStrokePaint >> athensFillRectangle2: aRect on: anAthensCanvas [
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+
+	topLeftPaint
+		athensFillPath2: (self pathForTopLeftBorderOf2: (aRect expandBy: width/2.0) on: anAthensCanvas)
+		on: anAthensCanvas.
+	bottomRightPaint
+		athensFillPath2: (self pathForBottomRightBorderOf2: (aRect expandBy: width/2.0) on: anAthensCanvas)
+		on: anAthensCanvas
+]
+
+{ #category : 'drawing' }
 AthensBorderStrokePaint >> athensFillRectangle: aRect on: anAthensCanvas [
 	"This is a terminal method in rendering dispatch scheme
 	canvas->shape->paint. See AthensCanvas>>fillShape: "
@@ -48,6 +61,21 @@ AthensBorderStrokePaint >> bottomRightPaint: anAthensPaint [
 ]
 
 { #category : 'private' }
+AthensBorderStrokePaint >> pathForBottomRightBorderOf2: aRectangle on: anAthensCanvas [
+	^ anAthensCanvas
+		createPath: [ :builder |
+			builder
+				absolute;
+				moveToX2: aRectangle left Y: aRectangle bottom;
+				lineToX2: aRectangle right Y: aRectangle bottom;
+				lineToX2: aRectangle right Y: aRectangle top;
+				lineToX2: aRectangle right - width Y: aRectangle top + width;
+				lineToX2: aRectangle right - width Y: aRectangle bottom - width;
+				lineToX2: aRectangle left + width Y: aRectangle bottom - width;
+				close2 ]
+]
+
+{ #category : 'private' }
 AthensBorderStrokePaint >> pathForBottomRightBorderOf: aRectangle on: anAthensCanvas [
 	^ anAthensCanvas
 		createPath: [ :builder |
@@ -60,6 +88,21 @@ AthensBorderStrokePaint >> pathForBottomRightBorderOf: aRectangle on: anAthensCa
 				lineToX: aRectangle right - width Y: aRectangle bottom - width;
 				lineToX: aRectangle left + width Y: aRectangle bottom - width;
 				close ]
+]
+
+{ #category : 'private' }
+AthensBorderStrokePaint >> pathForTopLeftBorderOf2: aRectangle on: anAthensCanvas [
+	^ anAthensCanvas
+		createPath: [ :builder |
+			builder
+				absolute;
+				moveToX2: aRectangle left Y: aRectangle bottom;
+				lineToX2: aRectangle left Y: aRectangle top;
+				lineToX2: aRectangle right Y: aRectangle top;
+				lineToX2: aRectangle right - width Y: aRectangle top + width;
+				lineToX2: aRectangle left + width Y: aRectangle top + width;
+				lineToX2: aRectangle left + width Y: aRectangle bottom - width;
+				close2 ]
 ]
 
 { #category : 'private' }

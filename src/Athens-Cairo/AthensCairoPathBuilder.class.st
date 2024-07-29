@@ -38,6 +38,16 @@ AthensCairoPathBuilder >> angleOfVector: v [
 ]
 
 { #category : 'private' }
+AthensCairoPathBuilder >> arcCenterX2: xc centerY: yc radius: radius startAngle: angle1 endAngle: angle2 [
+	^ self ffiCall2: #(void cairo_arc (AthensCairoCanvas context,
+				double xc,
+				double yc,
+				double radius,
+				double angle1,
+				double angle2) )
+]
+
+{ #category : 'private' }
 AthensCairoPathBuilder >> arcCenterX: xc centerY: yc radius: radius startAngle: angle1 endAngle: angle2 [
 	^ self ffiCall: #(void cairo_arc (AthensCairoCanvas context,
 				double xc,
@@ -122,9 +132,23 @@ AthensCairoPathBuilder >> close [
 	lastControlPoint := nil
 ]
 
+{ #category : 'path commands' }
+AthensCairoPathBuilder >> close2 [
+
+	self closePath2.
+
+	endPoint := self getCurrentPoint2.
+	lastControlPoint := nil
+]
+
 { #category : 'private' }
 AthensCairoPathBuilder >> closePath [
 	^ self ffiCall: #(void cairo_close_path (AthensCairoCanvas context))
+]
+
+{ #category : 'private' }
+AthensCairoPathBuilder >> closePath2 [
+	^ self ffiCall2: #(void cairo_close_path (AthensCairoCanvas context))
 ]
 
 { #category : 'accessing' }
@@ -136,6 +160,27 @@ AthensCairoPathBuilder >> context: anObject [
 { #category : 'private' }
 AthensCairoPathBuilder >> copyPath [
 	^ self ffiCall: #( AthensCairoPath cairo_copy_path (AthensCairoCanvas context) )
+]
+
+{ #category : 'private' }
+AthensCairoPathBuilder >> copyPath2 [
+	^ self ffiCall2: #( AthensCairoPath cairo_copy_path (AthensCairoCanvas context) )
+]
+
+{ #category : 'accessing' }
+AthensCairoPathBuilder >> createPath2: aBlock [
+
+	self newPath2.
+	"set default to relative"
+	absolute := false.
+	endPoint := ZeroPoint.
+
+	"set the implicit path origin"
+	self moveToX2: 0.0 Y: 0.0.
+
+	aBlock value: self.
+
+	^ self copyPath2 initialize
 ]
 
 { #category : 'accessing' }
@@ -152,6 +197,17 @@ AthensCairoPathBuilder >> createPath: aBlock [
 	aBlock value: self.
 
 	^ self copyPath initialize
+]
+
+{ #category : 'path commands' }
+AthensCairoPathBuilder >> curveVia2: p1 and: p2 to: aPoint [
+	|  pt1 |
+
+	pt1 := self toAbsolute: p1.
+	lastControlPoint := self toAbsolute: p2.
+	endPoint := self toAbsolute: aPoint.
+
+	self curveViaX2: pt1 x Y: pt1 y viaX: lastControlPoint x Y: lastControlPoint y toX: endPoint x Y: endPoint y
 ]
 
 { #category : 'path commands' }
@@ -194,6 +250,18 @@ The two control points for the cubic are:
 ]
 
 { #category : 'private' }
+AthensCairoPathBuilder >> curveViaX2: x1 Y: y1 viaX: x2 Y: y2 toX: x3 Y: y3 [
+
+	^ self
+		  primCurveViaX2: x1 asFloat
+		  Y: y1 asFloat
+		  viaX: x2 asFloat
+		  Y: y2 asFloat
+		  toX: x3 asFloat
+		  Y: y3 asFloat
+]
+
+{ #category : 'private' }
 AthensCairoPathBuilder >> curveViaX: x1 Y: y1 viaX: x2 Y: y2 toX: x3 Y: y3 [
 
 	^ self
@@ -219,6 +287,11 @@ AthensCairoPathBuilder >> getCurrentPoint [
 ]
 
 { #category : 'private' }
+AthensCairoPathBuilder >> getCurrentPoint2 [
+	^ context getCurrentPoint2
+]
+
+{ #category : 'private' }
 AthensCairoPathBuilder >> glyphPath: glyphs size: numGlyphs [
 	"void cairo_glyph_path (cairo_t *cr,
                   const cairo_glyph_t *glyphs,
@@ -236,6 +309,14 @@ AthensCairoPathBuilder >> hLineTo: x [
 ]
 
 { #category : 'path commands' }
+AthensCairoPathBuilder >> lineTo2: aPoint [
+
+	endPoint := self toAbsolute: aPoint.
+	lastControlPoint := nil.
+	^ self lineToX2: endPoint x asFloat Y: endPoint y asFloat
+]
+
+{ #category : 'path commands' }
 AthensCairoPathBuilder >> lineTo: aPoint [
 
 	endPoint := self toAbsolute: aPoint.
@@ -244,9 +325,24 @@ AthensCairoPathBuilder >> lineTo: aPoint [
 ]
 
 { #category : 'private' }
+AthensCairoPathBuilder >> lineToX2: x Y: y [
+	^ self ffiCall2: #(void cairo_line_to (AthensCairoCanvas context,
+		 double x, double y ) )
+]
+
+{ #category : 'private' }
 AthensCairoPathBuilder >> lineToX: x Y: y [
 	^ self ffiCall: #(void cairo_line_to (AthensCairoCanvas context,
 		 double x, double y ) )
+]
+
+{ #category : 'path commands' }
+AthensCairoPathBuilder >> moveTo2: aPoint [
+
+	endPoint := self toAbsolute: aPoint.
+	lastControlPoint := nil.
+
+	^ self moveToX2: endPoint x asFloat Y: endPoint y asFloat
 ]
 
 { #category : 'path commands' }
@@ -259,6 +355,13 @@ AthensCairoPathBuilder >> moveTo: aPoint [
 ]
 
 { #category : 'private' }
+AthensCairoPathBuilder >> moveToX2: x Y: y [
+	" move command always starts a new contour "
+	^ self ffiCall2: #(void cairo_move_to (AthensCairoCanvas context,
+		 double x, double y ) )
+]
+
+{ #category : 'private' }
 AthensCairoPathBuilder >> moveToX: x Y: y [
 	" move command always starts a new contour "
 	^ self ffiCall: #(void cairo_move_to (AthensCairoCanvas context,
@@ -268,6 +371,22 @@ AthensCairoPathBuilder >> moveToX: x Y: y [
 { #category : 'private' }
 AthensCairoPathBuilder >> newPath [
  ^ self ffiCall: #( void cairo_new_path ( AthensCairoCanvas context ) )
+]
+
+{ #category : 'private' }
+AthensCairoPathBuilder >> newPath2 [
+ ^ self ffiCall2: #( void cairo_new_path ( AthensCairoCanvas context ) )
+]
+
+{ #category : 'private' }
+AthensCairoPathBuilder >> primCurveViaX2: x1 Y: y1 viaX: x2 Y: y2 toX: x3 Y: y3 [
+	^ self ffiCall2: #(void cairo_curve_to(AthensCairoCanvas context,
+                                                         double x1,
+                                                         double y1,
+                                                         double x2,
+                                                         double y2,
+                                                         double x3,
+                                                         double y3))
 ]
 
 { #category : 'private' }

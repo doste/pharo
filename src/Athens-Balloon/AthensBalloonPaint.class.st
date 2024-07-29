@@ -16,6 +16,12 @@ AthensBalloonPaint class >> isAbstract [
 ]
 
 { #category : 'converting' }
+AthensBalloonPaint >> asAthensPaintOn2: surf [
+
+	^ self
+]
+
+{ #category : 'converting' }
 AthensBalloonPaint >> asAthensPaintOn: surf [
 
 	^ self

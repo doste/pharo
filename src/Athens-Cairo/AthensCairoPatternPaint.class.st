@@ -26,6 +26,11 @@ AthensCairoPatternPaint class >> primDestroyPattern: aHandle [
 ]
 
 { #category : 'converting' }
+AthensCairoPatternPaint >> asAthensPaintOn2: anAthensCanvas [
+	^ self
+]
+
+{ #category : 'converting' }
 AthensCairoPatternPaint >> asAthensPaintOn: anAthensCanvas [
 	^ self
 ]
@@ -33,6 +38,18 @@ AthensCairoPatternPaint >> asAthensPaintOn: anAthensCanvas [
 { #category : 'converting' }
 AthensCairoPatternPaint >> asStrokePaintOn: aCanvas [
 	^ aCanvas surface createStrokePaintFor: self
+]
+
+{ #category : 'drawing' }
+AthensCairoPatternPaint >> athensFillPath2: path on: aCanvas [
+
+	aCanvas
+		newPath2;
+		loadPath2: path.
+	self setMatrix2: aCanvas paintTransform inverted.
+	self loadOnCairoCanvas2: aCanvas.
+
+	aCanvas fill2
 ]
 
 { #category : 'drawing' }
@@ -45,6 +62,22 @@ AthensCairoPatternPaint >> athensFillPath: path on: aCanvas [
 	self loadOnCairoCanvas: aCanvas.
 
 	aCanvas fill
+]
+
+{ #category : 'drawing' }
+AthensCairoPatternPaint >> athensFillRectangle2: aRectangle on: aCanvas [
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+
+	aCanvas
+		rectangleX2: aRectangle left
+		y: aRectangle top
+		width: aRectangle width
+		height: aRectangle height.
+
+	self setMatrix2: aCanvas paintTransform inverted2.
+	self loadOnCairoCanvas2: aCanvas.
+	aCanvas fill2
 ]
 
 { #category : 'drawing' }
@@ -98,6 +131,17 @@ AthensCairoPatternPaint >> isPatternTypeMismatch [
 { #category : 'testing' }
 AthensCairoPatternPaint >> isSuccess [
 	^ self status  =	CAIRO_STATUS_SUCCESS
+]
+
+{ #category : 'drawing' }
+AthensCairoPatternPaint >> loadOnCairoCanvas2: aCanvas [
+	"
+	Note: The pattern's transformation matrix will be locked to the user space in effect at the time of cairo_set_source(). This means that further modifications of the current transformation matrix will not affect the source pattern. See cairo_pattern_set_matrix().
+	"
+
+	self isSuccess
+		ifTrue:[ aCanvas primSetSource2: self ]
+		ifFalse:[ aCanvas setSourceR2: 1.0 g: 0.0 b: 0.0 a: 1.0]
 ]
 
 { #category : 'drawing' }
@@ -165,6 +209,14 @@ AthensCairoPatternPaint >> setExtend: aSymbol [
 ]
 
 { #category : 'accessing' }
+AthensCairoPatternPaint >> setMatrix2: m [
+	^ self ffiCall2: #(
+		void
+			cairo_pattern_set_matrix ( self, AthensCairoMatrix * m)
+		)
+]
+
+{ #category : 'accessing' }
 AthensCairoPatternPaint >> setMatrix: m [
 	^ self ffiCall: #(
 		void
@@ -175,4 +227,9 @@ AthensCairoPatternPaint >> setMatrix: m [
 { #category : 'accessing' }
 AthensCairoPatternPaint >> status [
 	^ self ffiCall: #(int cairo_pattern_status (cairo_pattern_t  self))
+]
+
+{ #category : 'accessing' }
+AthensCairoPatternPaint >> status2 [
+	^ self ffiCall2: #(int cairo_pattern_status (cairo_pattern_t  self))
 ]

@@ -21,6 +21,13 @@ Rectangle >> asPolygonTransformedBy: aTransform [
 ]
 
 { #category : '*Athens-Core' }
+Rectangle >> paintFillsUsing2: aPaint on: anAthensCanvas [
+	"This method is a part of rendering dispatch  Canvas->receiver->paint"
+
+	^ aPaint athensFillRectangle2: self on: anAthensCanvas
+]
+
+{ #category : '*Athens-Core' }
 Rectangle >> paintFillsUsing: aPaint on: anAthensCanvas [
 	"This method is a part of rendering dispatch  Canvas->receiver->paint"
 

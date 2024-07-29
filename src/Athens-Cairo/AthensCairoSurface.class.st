@@ -46,6 +46,21 @@ AthensCairoSurface class >> checkSession [
 ]
 
 { #category : 'instance creation' }
+AthensCairoSurface class >> createFromFile2: aFileName ifFailed: aBlock [
+	"Right now, this protocol is Cairo backend only. "
+
+ 	| surface cstring |
+	cstring := aFileName , (Character value: 0) asString.
+	surface :=  self primCreateFromFile2: cstring.
+	surface isSuccess not
+		ifTrue: [
+			self destroySurfaceHandle2: surface handle asInteger.
+			^ aBlock cull: surface status2 ]
+		ifFalse: [ surface initialize ].
+	^ surface
+]
+
+{ #category : 'instance creation' }
 AthensCairoSurface class >> createFromFile: aFileName ifFailed: aBlock [
 	"Right now, this protocol is Cairo backend only. "
 
@@ -162,6 +177,11 @@ AthensCairoSurface class >> destroyContextHandle: aHandle [
 ]
 
 { #category : 'private' }
+AthensCairoSurface class >> destroySurfaceHandle2: handle [
+	^ self ffiCall2: #( void cairo_surface_destroy ( size_t handle ) )
+]
+
+{ #category : 'private' }
 AthensCairoSurface class >> destroySurfaceHandle: handle [
 	^ self ffiCall: #( void cairo_surface_destroy ( size_t handle ) )
 ]
@@ -170,6 +190,16 @@ AthensCairoSurface class >> destroySurfaceHandle: handle [
 AthensCairoSurface class >> dispatchStruct [
 	self checkSession.
 	^ dispatchStruct
+]
+
+{ #category : 'instance creation' }
+AthensCairoSurface class >> extent2: anExtent [
+	^ self extent2: anExtent format: CAIRO_FORMAT_ARGB32
+]
+
+{ #category : 'instance creation' }
+AthensCairoSurface class >> extent2: anExtent format: aFormat [
+	^ ( self primImage2: aFormat width: anExtent x height: anExtent y + 1) initialize
 ]
 
 { #category : 'instance creation' }
@@ -194,6 +224,25 @@ AthensCairoSurface class >> finalizeResourceData: data [
 	self unregisterSurfaceWithId: id.
 	self destroyContextHandle: contextHandle value.
 	self destroySurfaceHandle: handle value
+]
+
+{ #category : 'instance creation' }
+AthensCairoSurface class >> fromForm2: aForm [
+	| form surface newBits |
+	form := aForm unhibernate; asFormOfDepth: 32.
+	surface := self extent2: aForm extent2.
+	"we should convert form bits with premultiplied alpha"
+	newBits := form bits collect: [:pixel |
+		| alpha r g b|
+		alpha := (pixel >> 24) / 255.
+		r := ( (pixel bitAnd: 255) * alpha ) asInteger.
+		g := ( (pixel >>8 bitAnd: 255) * alpha ) asInteger.
+		b := ( (pixel >>16 bitAnd: 255) * alpha ) asInteger.
+		(pixel bitAnd: 16rFF000000) + (b<<16) + (g<<8) + r
+		].
+	LibC memCopy: newBits to: surface getDataPtr getHandle size: (form width * form height *4).
+	surface markDirty2.
+	^ surface
 ]
 
 { #category : 'instance creation' }
@@ -250,8 +299,20 @@ AthensCairoSurface class >> initializeForNewSession [
 ]
 
 { #category : 'private' }
+AthensCairoSurface class >> primCreateFromFile2: aFileName [
+	^ self ffiCall2: #(AthensCairoSurface cairo_image_surface_create_from_png (char* aFileName))
+]
+
+{ #category : 'private' }
 AthensCairoSurface class >> primCreateFromFile: aFileName [
 	^ self ffiCall: #(AthensCairoSurface cairo_image_surface_create_from_png (char* aFileName))
+]
+
+{ #category : 'private' }
+AthensCairoSurface class >> primImage2: aFormat width: aWidth height: aHeight [
+	^ self ffiCall2: #(AthensCairoSurface cairo_image_surface_create (int aFormat,
+                                                         int aWidth,
+                                                         int aHeight) )
 ]
 
 { #category : 'private' }
@@ -336,6 +397,11 @@ AthensCairoSurface class >> width: aWidth height: aHeight [
 ]
 
 { #category : 'converting' }
+AthensCairoSurface >> asAthensPaintOn2: aCanvas [
+	^ AthensCairoPatternSurfacePaint createForSurface2: self
+]
+
+{ #category : 'converting' }
 AthensCairoSurface >> asAthensPaintOn: aCanvas [
 	^ AthensCairoPatternSurfacePaint createForSurface: self
 ]
@@ -377,6 +443,24 @@ AthensCairoSurface >> clear [
 ]
 
 { #category : 'accessing' }
+AthensCairoSurface >> clear2 [
+	^ self clear2: Color transparent
+]
+
+{ #category : 'accessing' }
+AthensCairoSurface >> clear2: clearPaint [
+	currentCanvas pathTransform restoreAfter2: [
+		currentCanvas pathTransform loadIdentity2.
+		currentCanvas paintMode restoreAfter2: [
+			currentCanvas paintMode source2.
+			currentCanvas
+				setPaint2: clearPaint;
+				drawShape: (0@0 extent2: self extent2).
+
+        ]]
+]
+
+{ #category : 'accessing' }
 AthensCairoSurface >> clear: clearPaint [
 	currentCanvas pathTransform restoreAfter: [
 		currentCanvas pathTransform loadIdentity.
@@ -387,6 +471,17 @@ AthensCairoSurface >> clear: clearPaint [
 				drawShape: (0@0 extent: self extent).
 
         ]]
+]
+
+{ #category : 'paints' }
+AthensCairoSurface >> createFormPaint2: aForm [
+	"here we should convert form to cairo surface"
+
+	| newSurface |
+
+	newSurface := self class fromForm2: (aForm asFormOfDepth: 32).
+
+	^ newSurface asAthensPaintOn2: context
 ]
 
 { #category : 'paints' }
@@ -401,6 +496,14 @@ AthensCairoSurface >> createFormPaint: aForm [
 ]
 
 { #category : 'paints' }
+AthensCairoSurface >> createLinearGradient2: aColorRamp start: aStartPoint stop: aStopPoint [
+	^ AthensCairoGradientPaint
+		createLinearGradient2: aColorRamp
+		start: aStartPoint
+		stop: aStopPoint
+]
+
+{ #category : 'paints' }
 AthensCairoSurface >> createLinearGradient: aColorRamp start: aStartPoint stop: aStopPoint [
 	^ AthensCairoGradientPaint
 		createLinearGradient: aColorRamp
@@ -409,13 +512,33 @@ AthensCairoSurface >> createLinearGradient: aColorRamp start: aStartPoint stop: 
 ]
 
 { #category : 'paints' }
+AthensCairoSurface >> createMeshGradientWithPatches2: aListOfMeshPatches [
+	^ AthensCairoMeshGradientPaint createMeshGradientWithPatches2: aListOfMeshPatches
+]
+
+{ #category : 'paints' }
 AthensCairoSurface >> createMeshGradientWithPatches: aListOfMeshPatches [
 	^ AthensCairoMeshGradientPaint createMeshGradientWithPatches: aListOfMeshPatches
 ]
 
 { #category : 'creation' }
+AthensCairoSurface >> createPath2: aPathCreatingBlock [
+	^ builder createPath2:  aPathCreatingBlock
+]
+
+{ #category : 'creation' }
 AthensCairoSurface >> createPath: aPathCreatingBlock [
 	^ builder createPath:  aPathCreatingBlock
+]
+
+{ #category : 'paints' }
+AthensCairoSurface >> createRadialGradient2: colorRamp center: aCenter radius: aRadius focalPoint: fp [
+	^AthensCairoGradientPaint
+		radialBetween2: fp
+		extending: 0
+		and: aCenter
+		extending: aRadius
+		withColorRamp: colorRamp
 ]
 
 { #category : 'paints' }
@@ -441,6 +564,25 @@ AthensCairoSurface >> createStrokePaintFor: aPaint [
 ]
 
 { #category : 'drawing' }
+AthensCairoSurface >> drawDuring2: aBlock [
+
+	"You may draw on receiver only when inside a block and only using provided canvas object.
+	This ensures releasing system resources used after finishing drawing"
+
+	self checkSession.
+
+	currentCanvas ifNotNil: [ self attemptToRecurseDrawing ].
+	[
+		currentCanvas := context.
+		self privSetDefaults2.
+		aBlock value: currentCanvas.
+		self flush2.
+	] ensure: [
+		currentCanvas := nil.
+	]
+]
+
+{ #category : 'drawing' }
 AthensCairoSurface >> drawDuring: aBlock [
 
 	"You may draw on receiver only when inside a block and only using provided canvas object.
@@ -462,6 +604,11 @@ AthensCairoSurface >> drawDuring: aBlock [
 { #category : 'accessing' }
 AthensCairoSurface >> extent [
 	^ self width @ self height
+]
+
+{ #category : 'accessing' }
+AthensCairoSurface >> extent2 [
+	^ self width2 @ self height2
 ]
 
 { #category : 'rendering dispatch' }
@@ -497,6 +644,11 @@ AthensCairoSurface >> finish [
 { #category : 'private' }
 AthensCairoSurface >> flush [
 	^ self ffiCall: #( void cairo_surface_flush (self) )
+]
+
+{ #category : 'private' }
+AthensCairoSurface >> flush2 [
+	^ self ffiCall2: #( void cairo_surface_flush (self) )
 ]
 
 { #category : 'caching' }
@@ -550,6 +702,12 @@ AthensCairoSurface >> height [
 	^self privateHeight - 1
 ]
 
+{ #category : 'accessing' }
+AthensCairoSurface >> height2 [
+
+	^self privateHeight2 - 1
+]
+
 { #category : 'initialization' }
 AthensCairoSurface >> initialize [
 	"the handle should be set already since we using an NB callout to create an instance"
@@ -585,6 +743,11 @@ AthensCairoSurface >> markDirty [
 ]
 
 { #category : 'private' }
+AthensCairoSurface >> markDirty2 [
+	^ self ffiCall2: #( void cairo_surface_mark_dirty (self) )
+]
+
+{ #category : 'private' }
 AthensCairoSurface >> newCanvas [
 	"Answer a preinitialized instance of AthensCanvas.
 	Private to receiver and its subclasses, override seldom"
@@ -593,8 +756,21 @@ AthensCairoSurface >> newCanvas [
 ]
 
 { #category : 'private' }
+AthensCairoSurface >> newCanvas2 [
+	"Answer a preinitialized instance of AthensCanvas.
+	Private to receiver and its subclasses, override seldom"
+
+	^ self primCreateCanvas2 surface2: self
+]
+
+{ #category : 'private' }
 AthensCairoSurface >> primCreateCanvas [
 	^ self ffiCall: #( AthensCairoCanvas cairo_create (self) )
+]
+
+{ #category : 'private' }
+AthensCairoSurface >> primCreateCanvas2 [
+	^ self ffiCall2: #( AthensCairoCanvas cairo_create (self) )
 ]
 
 { #category : 'private' }
@@ -606,8 +782,22 @@ AthensCairoSurface >> privSetDefaults [
 ]
 
 { #category : 'private' }
+AthensCairoSurface >> privSetDefaults2 [
+	"reset matrices"
+	currentCanvas pathTransform loadIdentity2.
+	currentCanvas paintTransform loadIdentity2.
+	currentCanvas paintMode over
+]
+
+{ #category : 'private' }
 AthensCairoSurface >> privateHeight [
 	^ self ffiCall: #(
+		int cairo_image_surface_get_height ( self ) )
+]
+
+{ #category : 'private' }
+AthensCairoSurface >> privateHeight2 [
+	^ self ffiCall2: #(
 		int cairo_image_surface_get_height ( self ) )
 ]
 
@@ -626,6 +816,11 @@ AthensCairoSurface >> status [
 	^ self ffiCall: #(int cairo_surface_status (self) )
 ]
 
+{ #category : 'accessing' }
+AthensCairoSurface >> status2 [
+	^ self ffiCall2: #(int cairo_surface_status (self) )
+]
+
 { #category : 'private' }
 AthensCairoSurface >> statusToString: aCairoStatusT [
 	^ self ffiCall: #(String   cairo_status_to_string  (cairo_status_t aCairoStatusT))
@@ -640,6 +835,12 @@ AthensCairoSurface >> stride [
 { #category : 'accessing' }
 AthensCairoSurface >> width [
 	^ self ffiCall: #(
+		int cairo_image_surface_get_width ( self ) )
+]
+
+{ #category : 'accessing' }
+AthensCairoSurface >> width2 [
+	^ self ffiCall2: #(
 		int cairo_image_surface_get_width ( self ) )
 ]
 

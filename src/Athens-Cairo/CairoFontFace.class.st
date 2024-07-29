@@ -111,6 +111,11 @@ CairoFontFace >> status [
 ]
 
 { #category : 'accessing' }
+CairoFontFace >> status2 [
+	^ self ffiCall2: #(int cairo_font_face_status (self))
+]
+
+{ #category : 'accessing' }
 CairoFontFace >> synthesizeBold [
 	self primSetSynthesizeEmphasis: 1
 ]

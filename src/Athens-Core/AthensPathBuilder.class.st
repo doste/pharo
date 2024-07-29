@@ -14,6 +14,12 @@ Class {
 }
 
 { #category : 'instance creation' }
+AthensPathBuilder class >> createPath2: aBlock [
+
+	^ self new createPath2: aBlock
+]
+
+{ #category : 'instance creation' }
 AthensPathBuilder class >> createPath: aBlock [
 
 	^ self new createPath: aBlock
@@ -52,9 +58,32 @@ AthensPathBuilder >> close [
 	self subclassResponsibility
 ]
 
+{ #category : 'path commands' }
+AthensPathBuilder >> close2 [
+	"Close the current path controur"
+
+	self subclassResponsibility
+]
+
+{ #category : 'creating path' }
+AthensPathBuilder >> createPath2:	aBlock [
+	"aBlock value: self ...."
+
+	self subclassResponsibility
+]
+
 { #category : 'creating path' }
 AthensPathBuilder >> createPath:	aBlock [
 	"aBlock value: self ...."
+
+	self subclassResponsibility
+]
+
+{ #category : 'path commands' }
+AthensPathBuilder >> curveVia2: cp1 and: cp2 to: aPoint [
+	"Add a cubic bezier curve,
+	starting from current path endpoint, using control points cp1, cp2
+	and ending at aPoint "
 
 	self subclassResponsibility
 ]
@@ -87,9 +116,22 @@ AthensPathBuilder >> cwArcTo: endPt angle: rot [
 ]
 
 { #category : 'path commands' }
+AthensPathBuilder >> lineTo2: aPoint [
+	"Add a line segment, starting from current path endpoint to aPoint"
+
+	self subclassResponsibility
+]
+
+{ #category : 'path commands' }
 AthensPathBuilder >> lineTo: aPoint [
 	"Add a line segment, starting from current path endpoint to aPoint"
 
+	self subclassResponsibility
+]
+
+{ #category : 'path commands' }
+AthensPathBuilder >> moveTo2: aPoint [
+	"Move command always starts a new contour "
 	self subclassResponsibility
 ]
 

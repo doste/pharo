@@ -1,6 +1,14 @@
 Extension { #name : 'Color' }
 
 { #category : '*Athens-Core' }
+Color >> asAthensPaintOn2: anAthensCanvas [
+
+	^ self
+
+	"^ anAthensCanvas surface createSolidColorPaint: self"
+]
+
+{ #category : '*Athens-Core' }
 Color >> asAthensPaintOn: anAthensCanvas [
 
 	^ self

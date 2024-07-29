@@ -70,6 +70,13 @@ AthensBalloonPath >> numContours [
 ]
 
 { #category : 'drawing' }
+AthensBalloonPath >> paintFillsUsing2: aPaint on: anAthensCanvas [
+	"This method is a part of rendering dispatch  Canvas->receiver->paint"
+
+	^ aPaint athensFillPath2: self on: anAthensCanvas
+]
+
+{ #category : 'drawing' }
 AthensBalloonPath >> paintFillsUsing: aPaint on: anAthensCanvas [
 	"This method is a part of rendering dispatch  Canvas->receiver->paint"
 

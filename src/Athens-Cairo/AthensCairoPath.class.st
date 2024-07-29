@@ -36,6 +36,14 @@ AthensCairoPath >> initialize [
 ]
 
 { #category : 'drawing' }
+AthensCairoPath >> paintFillsUsing2: aPaint on: anAthensCanvas [
+
+	"This method is a part of rendering dispatch  Canvas->receiver->paint"
+
+	^ aPaint athensFillPath2: self on: anAthensCanvas
+]
+
+{ #category : 'drawing' }
 AthensCairoPath >> paintFillsUsing: aPaint on: anAthensCanvas [
 
 	"This method is a part of rendering dispatch  Canvas->receiver->paint"

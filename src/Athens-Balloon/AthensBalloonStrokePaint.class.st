@@ -10,9 +10,21 @@ Class {
 }
 
 { #category : 'rendering' }
+AthensBalloonStrokePaint >> athensFillPath2: aPath on: aCanvas [
+
+	^ fillPaint strokePath: aPath on: aCanvas strokeWidth: width
+]
+
+{ #category : 'rendering' }
 AthensBalloonStrokePaint >> athensFillPath: aPath on: aCanvas [
 
 	^ fillPaint strokePath: aPath on: aCanvas strokeWidth: width
+]
+
+{ #category : 'rendering' }
+AthensBalloonStrokePaint >> athensFillRectangle2: aRect on: aCanvas [
+
+	^ fillPaint strokeRect: aRect on: aCanvas strokeWidth: width
 ]
 
 { #category : 'rendering' }

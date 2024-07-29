@@ -87,8 +87,18 @@ AthensPathConverter >> finish [
 ]
 
 { #category : 'converting path commands' }
+AthensPathConverter >> lineTo2: aPoint [
+	^ dest lineTo2: aPoint
+]
+
+{ #category : 'converting path commands' }
 AthensPathConverter >> lineTo: aPoint [
 	^ dest lineTo: aPoint
+]
+
+{ #category : 'converting path commands' }
+AthensPathConverter >> moveTo2: aPoint [
+	^ dest moveTo2: aPoint
 ]
 
 { #category : 'converting path commands' }

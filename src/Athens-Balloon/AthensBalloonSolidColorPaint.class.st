@@ -13,11 +13,27 @@ Class {
 }
 
 { #category : 'rendering' }
+AthensBalloonSolidColorPaint >> athensFillPath2: athensBalloonPath on: anAthensCanvas [
+
+	^ anAthensCanvas surface
+		fillBezierShape: athensBalloonPath contoursForFilling
+		color: color
+]
+
+{ #category : 'rendering' }
 AthensBalloonSolidColorPaint >> athensFillPath: athensBalloonPath on: anAthensCanvas [
 
 	^ anAthensCanvas surface
 		fillBezierShape: athensBalloonPath contoursForFilling
 		color: color
+]
+
+{ #category : 'rendering' }
+AthensBalloonSolidColorPaint >> athensFillRectangle2: aRect on: canvas [
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+
+	^ canvas surface fillRectangle: aRect color: color
 ]
 
 { #category : 'rendering' }

@@ -61,6 +61,12 @@ MeshGradientPaint >> addTriangleWithPoints: controlPoints colors: colors [
 ]
 
 { #category : 'converting' }
+MeshGradientPaint >> asAthensPaintOn2: aCanvas [
+	^ aCanvas surface
+		createMeshGradientWithPatches2: patches
+]
+
+{ #category : 'converting' }
 MeshGradientPaint >> asAthensPaintOn: aCanvas [
 	^ aCanvas surface
 		createMeshGradientWithPatches: patches

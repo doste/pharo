@@ -60,6 +60,15 @@ AthensPaintMode >> clear [
 ]
 
 { #category : 'modes' }
+AthensPaintMode >> clear2 [
+	"Set 'clear' drawing mode.
+
+	Drawing under this mode will clear the surface under the shape boundaries"
+
+	self notAvailable
+]
+
+{ #category : 'modes' }
 AthensPaintMode >> colorBurn [
 	self notAvailable
 ]
@@ -187,6 +196,13 @@ AthensPaintMode >> over [
 { #category : 'modes' }
 AthensPaintMode >> overlay [
 	self notAvailable
+]
+
+{ #category : 'convenience' }
+AthensPaintMode >> restoreAfter2: aBlock [
+	"Restore current paint mode after evaluating a block"
+
+	self subclassResponsibility
 ]
 
 { #category : 'convenience' }

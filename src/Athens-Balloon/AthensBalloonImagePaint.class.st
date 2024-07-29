@@ -16,12 +16,36 @@ Class {
 }
 
 { #category : 'rendering' }
+AthensBalloonImagePaint >> athensFillPath2: aPath on: anAthensCanvas [
+
+	anAthensCanvas surface engine
+		prepareForRendering;
+		registerFormFill: form origin: origin direction: direction normal: self normal;
+		fillBezierShape: aPath contoursForFilling
+]
+
+{ #category : 'rendering' }
 AthensBalloonImagePaint >> athensFillPath: aPath on: anAthensCanvas [
 
 	anAthensCanvas surface engine
 		prepareForRendering;
 		registerFormFill: form origin: origin direction: direction normal: self normal;
 		fillBezierShape: aPath contoursForFilling
+]
+
+{ #category : 'rendering' }
+AthensBalloonImagePaint >> athensFillRectangle2: aRect on: anAthensCanvas [
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+	|rotation normal|
+	rotation := anAthensCanvas surface paintTransform transform: direction.
+	normal := anAthensCanvas surface paintTransform transform:self normal.
+
+
+	anAthensCanvas surface engine reset
+		prepareForRendering;
+		registerFormFill: form origin: origin direction: rotation normal: normal tileFlag: tileFlag;
+		fillRectangle: aRect
 ]
 
 { #category : 'rendering' }

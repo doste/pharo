@@ -210,6 +210,12 @@ CairoScaledFont >> status [
 	^ self ffiCall: #(int cairo_scaled_font_status (self))
 ]
 
+{ #category : 'accessing' }
+CairoScaledFont >> status2 [
+"cairo_status_t      cairo_scaled_font_status            (cairo_scaled_font_t *scaled_font);"
+	^ self ffiCall2: #(int cairo_scaled_font_status (self))
+]
+
 { #category : 'locking' }
 CairoScaledFont >> unlock [
 

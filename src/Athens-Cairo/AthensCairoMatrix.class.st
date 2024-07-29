@@ -45,6 +45,11 @@ AthensCairoMatrix >> copy [
 	^ self class new loadAffineTransform: self
 ]
 
+{ #category : 'copying' }
+AthensCairoMatrix >> copy2 [
+	^ self class new loadAffineTransform2: self
+]
+
 { #category : 'private' }
 AthensCairoMatrix >> copyFromMatrix: m [
 	self assert: [ m getHandle ~= self getHandle ].
@@ -66,6 +71,18 @@ AthensCairoMatrix >> getMatrix [
 AthensCairoMatrix >> initialize [
 	super initialize.
 	self loadIdentity
+]
+
+{ #category : 'private' }
+AthensCairoMatrix >> initx2: x y: y sx: sx sy: sy shx: shx shy: shy [
+	^ self ffiCall2: #(
+		void cairo_matrix_init (AthensCairoMatrix * self,
+			double sx,
+			double shy,
+			double shx,
+			double sy,
+			double x,
+			double y))
 ]
 
 { #category : 'private' }
@@ -92,10 +109,23 @@ AthensCairoMatrix >> invert [
 ]
 
 { #category : 'transformations' }
+AthensCairoMatrix >> invert2 [
+	^self ffiCall2: #( cairo_status_t cairo_matrix_invert (AthensCairoMatrix *  self))
+]
+
+{ #category : 'transformations' }
 AthensCairoMatrix >> inverted [
  	| m |
 	m := self copy.
 	m invert.
+	^ m
+]
+
+{ #category : 'transformations' }
+AthensCairoMatrix >> inverted2 [
+ 	| m |
+	m := self copy2 .
+	m invert2.
 	^ m
 ]
 
@@ -108,6 +138,17 @@ AthensCairoMatrix >> isAffineTransform [
 AthensCairoMatrix >> isIdentity [
 	^ self sx = 1 and: [ self shx = 0 and: [ self x = 0 and: [
 	self shy = 0 and: [ self sy = 1 and: [ self y = 0]]]]]
+]
+
+{ #category : 'transformations' }
+AthensCairoMatrix >> loadAffineTransform2: m [
+	self
+		initx2: m x
+		y: m y
+		sx: m sx
+		sy: m sy
+		shx: m shx
+		shy: m shy
 ]
 
 { #category : 'transformations' }
@@ -129,6 +170,13 @@ AthensCairoMatrix >> loadIdentity [
 ]
 
 { #category : 'transformations' }
+AthensCairoMatrix >> loadIdentity2 [
+	"initialize with identity transform"
+
+	self primLoadIdentity2
+]
+
+{ #category : 'transformations' }
 AthensCairoMatrix >> multiplyBy: anAthensAffineTransform [
 
 	self primMultiplyBy: (
@@ -147,6 +195,12 @@ AthensCairoMatrix >> primLoadIdentity [
 ]
 
 { #category : 'private' }
+AthensCairoMatrix >> primLoadIdentity2 [
+	"initialize with identity transform"
+	^ self ffiCall2: #( void cairo_matrix_init_identity (AthensCairoMatrix * self ) )
+]
+
+{ #category : 'private' }
 AthensCairoMatrix >> primMultiplyBy: m [
 	^ self ffiCall: #(void   cairo_matrix_multiply
 		(AthensCairoMatrix * self,
@@ -159,6 +213,14 @@ AthensCairoMatrix >> primRotateByRadians: angle [
 	^ self ffiCall: #(
 		void cairo_matrix_rotate (AthensCairoMatrix *  self,
                                                          double angle))
+]
+
+{ #category : 'private' }
+AthensCairoMatrix >> primScaleX2: fx Y: fy [
+	^ self ffiCall2: #(
+		void cairo_matrix_scale (AthensCairoMatrix * self,
+                                                         double fx,
+                                                         double fy))
 ]
 
 { #category : 'private' }
@@ -190,11 +252,28 @@ AthensCairoMatrix >> primTransformX: x Y: y [
 ]
 
 { #category : 'private' }
+AthensCairoMatrix >> primTranslateX2: px Y: py [
+	^ self ffiCall2: #(
+		void cairo_matrix_translate (AthensCairoMatrix * self,
+                                                         double px,
+                                                         double py))
+]
+
+{ #category : 'private' }
 AthensCairoMatrix >> primTranslateX: px Y: py [
 	^ self ffiCall: #(
 		void cairo_matrix_translate (AthensCairoMatrix * self,
                                                          double px,
                                                          double py))
+]
+
+{ #category : 'transformations' }
+AthensCairoMatrix >> restoreAfter2: aBlock [
+	|previous|
+	previous := self copy2.
+	aBlock ensure: [
+		"self copyFromMatrix: previous.
+		"self loadAffineTransform2: previous ]
 ]
 
 { #category : 'transformations' }
@@ -220,6 +299,16 @@ AthensCairoMatrix >> rotateByRadians: angle [
 ]
 
 { #category : 'transformations' }
+AthensCairoMatrix >> scaleBy2: factor [
+
+	"if factor is number, do a uniform scale,
+	if not, then factor is assument to be an instance of Point containing non-uniform scale for each axis"
+	factor isPoint
+		ifTrue: [ self scaleX2: factor x asFloat Y: factor y asFloat ]
+		ifFalse: [ self scaleX2: factor asFloat Y: factor asFloat ]
+]
+
+{ #category : 'transformations' }
 AthensCairoMatrix >> scaleBy: factor [
 
 	"if factor is number, do a uniform scale,
@@ -227,6 +316,12 @@ AthensCairoMatrix >> scaleBy: factor [
 	factor isPoint
 		ifTrue: [ self scaleX: factor x asFloat Y: factor y asFloat ]
 		ifFalse: [ self scaleX: factor asFloat Y: factor asFloat ]
+]
+
+{ #category : 'transformations' }
+AthensCairoMatrix >> scaleX2: fx Y: fy [
+
+	^ self primScaleX2: fx asFloat Y: fy asFloat
 ]
 
 { #category : 'transformations' }
@@ -334,8 +429,19 @@ AthensCairoMatrix >> transformX: xValue Y: yValue [
 ]
 
 { #category : 'transformations' }
+AthensCairoMatrix >> translateBy2: aPoint [
+	self translateX2: aPoint x Y: aPoint y
+]
+
+{ #category : 'transformations' }
 AthensCairoMatrix >> translateBy: aPoint [
 	self translateX: aPoint x Y: aPoint y
+]
+
+{ #category : 'transformations' }
+AthensCairoMatrix >> translateX2: px Y: py [
+
+	^ self primTranslateX2: px asFloat Y: py asFloat
 ]
 
 { #category : 'transformations' }

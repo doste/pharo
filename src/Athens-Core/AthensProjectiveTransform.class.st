@@ -23,6 +23,12 @@ AthensProjectiveTransform >> invert [
 ]
 
 { #category : 'testing' }
+AthensProjectiveTransform >> invert2 [
+	self isAffineTransform ifTrue: [ ^ super invert ].
+	self shouldBeImplemented
+]
+
+{ #category : 'testing' }
 AthensProjectiveTransform >> isAffineTransform [
 	^ w0 = 0 and: [ w1 = 0 and: [ w2 = 1 ] ]
 ]

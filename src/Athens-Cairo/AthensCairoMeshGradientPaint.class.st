@@ -13,6 +13,16 @@ Class {
 }
 
 { #category : 'paints' }
+AthensCairoMeshGradientPaint class >> createMeshGradientWithPatches2: aListOfMeshPatches [
+	| paint |
+	paint := self primCreateMesh2.
+
+	"note, we do #initialize here because instance was created by primitive"
+	paint initialize; populatePatches2: aListOfMeshPatches.
+	^ paint
+]
+
+{ #category : 'paints' }
 AthensCairoMeshGradientPaint class >> createMeshGradientWithPatches: aListOfMeshPatches [
 	| paint |
 	paint := self primCreateMesh.
@@ -27,9 +37,19 @@ AthensCairoMeshGradientPaint class >> primCreateMesh [
 	^ self ffiCall: #(AthensCairoMeshGradientPaint cairo_pattern_create_mesh () )
 ]
 
+{ #category : 'paints' }
+AthensCairoMeshGradientPaint class >> primCreateMesh2 [
+	^ self ffiCall2: #(AthensCairoMeshGradientPaint cairo_pattern_create_mesh () )
+]
+
 { #category : 'mesh pattern commands' }
 AthensCairoMeshGradientPaint >> beginPatch [
 	^ self ffiCall:#( void cairo_mesh_pattern_begin_patch ( cairo_pattern_t  self ))
+]
+
+{ #category : 'mesh pattern commands' }
+AthensCairoMeshGradientPaint >> beginPatch2 [
+	^ self ffiCall2:#( void cairo_mesh_pattern_begin_patch ( cairo_pattern_t  self ))
 ]
 
 { #category : 'accessing' }
@@ -40,8 +60,24 @@ AthensCairoMeshGradientPaint >> colors: aSequenceOfColors [
 ]
 
 { #category : 'mesh pattern commands' }
+AthensCairoMeshGradientPaint >> curveVia2: pt1 and: lastControlPoint to: endPoint [
+	self curveViaX2: pt1 x Y: pt1 y viaX: lastControlPoint x Y: lastControlPoint y toX: endPoint x Y: endPoint y
+]
+
+{ #category : 'mesh pattern commands' }
 AthensCairoMeshGradientPaint >> curveVia: pt1 and: lastControlPoint to: endPoint [
 	self curveViaX: pt1 x Y: pt1 y viaX: lastControlPoint x Y: lastControlPoint y toX: endPoint x Y: endPoint y
+]
+
+{ #category : 'mesh pattern commands' }
+AthensCairoMeshGradientPaint >> curveViaX2: x1 Y: y1 viaX: x2 Y: y2 toX: x3 Y: y3 [
+	^ self ffiCall2: #(void cairo_mesh_pattern_curve_to(cairo_pattern_t self,
+                                                         double x1,
+                                                         double y1,
+                                                         double x2,
+                                                         double y2,
+                                                         double x3,
+                                                         double y3))
 ]
 
 { #category : 'mesh pattern commands' }
@@ -61,8 +97,23 @@ AthensCairoMeshGradientPaint >> endPatch [
 ]
 
 { #category : 'mesh pattern commands' }
+AthensCairoMeshGradientPaint >> endPatch2 [
+	^ self ffiCall2:#( void cairo_mesh_pattern_end_patch ( cairo_pattern_t  self ))
+]
+
+{ #category : 'mesh pattern commands' }
+AthensCairoMeshGradientPaint >> lineTo2: aPoint [
+	self lineToX2: aPoint x asFloat Y: aPoint y asFloat
+]
+
+{ #category : 'mesh pattern commands' }
 AthensCairoMeshGradientPaint >> lineTo: aPoint [
 	self lineToX: aPoint x asFloat Y: aPoint y asFloat
+]
+
+{ #category : 'mesh pattern commands' }
+AthensCairoMeshGradientPaint >> lineToX2: x Y: y [
+	^ self ffiCall2:#( void cairo_mesh_pattern_line_to ( cairo_pattern_t self, double x, double y ))
 ]
 
 { #category : 'mesh pattern commands' }
@@ -76,13 +127,33 @@ AthensCairoMeshGradientPaint >> moveTo: aPoint [
 ]
 
 { #category : 'mesh pattern commands' }
+AthensCairoMeshGradientPaint >> moveToX2: x Y: y [
+	^ self ffiCall2:#( void cairo_mesh_pattern_move_to ( cairo_pattern_t self, double x, double y ))
+]
+
+{ #category : 'mesh pattern commands' }
 AthensCairoMeshGradientPaint >> moveToX: x Y: y [
 	^ self ffiCall:#( void cairo_mesh_pattern_move_to ( cairo_pattern_t self, double x, double y ))
 ]
 
 { #category : 'private' }
+AthensCairoMeshGradientPaint >> populatePatches2: aListOfMeshPatches [
+	aListOfMeshPatches do: [ :each | each addToCairoMeshGradientPaint2: self ]
+]
+
+{ #category : 'private' }
 AthensCairoMeshGradientPaint >> populatePatches: aListOfMeshPatches [
 	aListOfMeshPatches do: [ :each | each addToCairoMeshGradientPaint: self ]
+]
+
+{ #category : 'mesh pattern commands' }
+AthensCairoMeshGradientPaint >> setCorner2: corner_num color: color [
+	self setCorner2: corner_num r: color red g: color green b: color blue a: color alpha
+]
+
+{ #category : 'mesh pattern commands' }
+AthensCairoMeshGradientPaint >> setCorner2: corner_num r: red g: green b: blue a: alpha [
+	^ self ffiCall2:#( void cairo_mesh_pattern_set_corner_color_rgba ( cairo_pattern_t self, uint corner_num, 	double red, double green, double blue, double alpha ))
 ]
 
 { #category : 'mesh pattern commands' }

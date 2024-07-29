@@ -87,6 +87,19 @@ AthensCairoExportSurface >> height [
 	^ extent y
 ]
 
+{ #category : 'accessing' }
+AthensCairoExportSurface >> height2 [
+	^ extent y
+]
+
+{ #category : 'initialization' }
+AthensCairoExportSurface >> initializeWith2: anExtent [
+	self initialize.
+
+	"We keep the extent to override related accessors because superclass uses cairo_image_surface_get_width and similar for height which don't give the right answer."
+	extent := anExtent
+]
+
 { #category : 'initialization' }
 AthensCairoExportSurface >> initializeWith: anExtent [
 	self initialize.
@@ -104,5 +117,10 @@ AthensCairoExportSurface >> resourceData [
 
 { #category : 'accessing' }
 AthensCairoExportSurface >> width [
+	^ extent x
+]
+
+{ #category : 'accessing' }
+AthensCairoExportSurface >> width2 [
 	^ extent x
 ]

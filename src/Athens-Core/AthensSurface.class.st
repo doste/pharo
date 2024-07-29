@@ -26,6 +26,14 @@ Class {
 }
 
 { #category : 'instance creation' }
+AthensSurface class >> extent2: aPoint [
+	"Create a new surface with given extent.
+	Note that some surfaces may not support this method, since they may represent an infinite surface."
+
+	self subclassResponsibility
+]
+
+{ #category : 'instance creation' }
 AthensSurface class >> extent: aPoint [
 	"Create a new surface with given extent.
 	Note that some surfaces may not support this method, since they may represent an infinite surface."
@@ -64,6 +72,20 @@ AthensSurface >> clear [
 ]
 
 { #category : 'public' }
+AthensSurface >> clear2 [
+	"clear the surface"
+
+	self subclassResponsibility
+]
+
+{ #category : 'public' }
+AthensSurface >> clear2: clearColor [
+	"clear the surface"
+
+	self subclassResponsibility
+]
+
+{ #category : 'public' }
 AthensSurface >> clear: clearColor [
 	"clear the surface"
 
@@ -81,6 +103,15 @@ AthensSurface >> createFormPaint: aForm [
 ]
 
 { #category : 'paints' }
+AthensSurface >> createLinearGradient2: colorRamp start: pt1 stop: pt2 [
+
+	"This protocol is deprecated. Use #createLinearGradient: start:stop: instead"
+
+
+	self shouldNotImplement
+]
+
+{ #category : 'paints' }
 AthensSurface >> createLinearGradient: colorRamp start: pt1 stop: pt2 [
 
 	"This protocol is deprecated. Use #createLinearGradient: start:stop: instead"
@@ -90,13 +121,36 @@ AthensSurface >> createLinearGradient: colorRamp start: pt1 stop: pt2 [
 ]
 
 { #category : 'paints' }
+AthensSurface >> createMeshGradientWithPatches2: aListOfMeshPatches [
+	self subclassResponsibility
+]
+
+{ #category : 'paints' }
 AthensSurface >> createMeshGradientWithPatches: aListOfMeshPatches [
+	self subclassResponsibility
+]
+
+{ #category : 'paths' }
+AthensSurface >> createPath2: aPathBuilder [
+	"Create a path from provided path builder instance"
 	self subclassResponsibility
 ]
 
 { #category : 'paths' }
 AthensSurface >> createPath: aPathBuilder [
 	"Create a path from provided path builder instance"
+	self subclassResponsibility
+]
+
+{ #category : 'paints' }
+AthensSurface >> createRadialGradient2: colorRamp center: aCenter radius: aRadius [
+	"by default, focal point coincede with center"
+	^ self createRadialGradient2: colorRamp center: aCenter radius: aRadius focalPoint: aCenter
+]
+
+{ #category : 'paints' }
+AthensSurface >> createRadialGradient2: colorRamp center: aCenter radius: aRadius focalPoint: fp [
+
 	self subclassResponsibility
 ]
 
@@ -198,6 +252,13 @@ AthensSurface >> maskEnabled [
 
 { #category : 'private' }
 AthensSurface >> newCanvas [
+	"Answer a preinitialized instance of AthensCanvas.
+	Private to receiver and its subclasses, override seldom"
+	^ AthensCanvas on: self
+]
+
+{ #category : 'private' }
+AthensSurface >> newCanvas2 [
 	"Answer a preinitialized instance of AthensCanvas.
 	Private to receiver and its subclasses, override seldom"
 	^ AthensCanvas on: self

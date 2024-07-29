@@ -18,6 +18,13 @@ AthensShape >> asAthensShapeOn: canvas [
 ]
 
 { #category : 'drawing' }
+AthensShape >> paintFillsUsing2: aPaint on: anAthensCanvas [
+	"This method is a part of rendering dispatch  Canvas->receiver->paint"
+
+	self subclassResponsibility
+]
+
+{ #category : 'drawing' }
 AthensShape >> paintFillsUsing: aPaint on: anAthensCanvas [
 	"This method is a part of rendering dispatch  Canvas->receiver->paint"
 

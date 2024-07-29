@@ -12,6 +12,16 @@ Class {
 }
 
 { #category : 'drawing' }
+AthensCompositePaint >> athensFillPath2: athensPath on: anAthensCanvas [
+
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+
+	paints do: [:paint |
+				paint athensFillPath2: athensPath on: anAthensCanvas ]
+]
+
+{ #category : 'drawing' }
 AthensCompositePaint >> athensFillPath: athensPath on: anAthensCanvas [
 
 	"This is a terminal method in rendering dispatch scheme
@@ -19,6 +29,16 @@ AthensCompositePaint >> athensFillPath: athensPath on: anAthensCanvas [
 
 	paints do: [:paint |
 				paint athensFillPath: athensPath on: anAthensCanvas ]
+]
+
+{ #category : 'drawing' }
+AthensCompositePaint >> athensFillRectangle2: aRect on: anAthensCanvas [
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+
+
+	paints do: [:paint |
+				paint athensFillRectangle2: aRect on: anAthensCanvas ]
 ]
 
 { #category : 'drawing' }

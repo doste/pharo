@@ -13,6 +13,16 @@ Class {
 }
 
 { #category : 'rendering' }
+AthensGradientPaint >> athensFillPath2: aPath on: canvas [
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+
+	| fill |
+	fill := self convertGradientToPaintOn: canvas.
+	fill athensFillPath: aPath on: canvas
+]
+
+{ #category : 'rendering' }
 AthensGradientPaint >> athensFillPath: aPath on: canvas [
 	"This is a terminal method in rendering dispatch scheme
 	canvas->shape->paint. See AthensCanvas>>fillShape: "
@@ -23,6 +33,16 @@ AthensGradientPaint >> athensFillPath: aPath on: canvas [
 ]
 
 { #category : 'rendering' }
+AthensGradientPaint >> athensFillRectangle2: aRect on: canvas [
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+
+	| fill |
+	fill := self convertGradientToPaintOn2: canvas.
+	fill athensFillRectangle2: aRect on: canvas
+]
+
+{ #category : 'rendering' }
 AthensGradientPaint >> athensFillRectangle: aRect on: canvas [
 	"This is a terminal method in rendering dispatch scheme
 	canvas->shape->paint. See AthensCanvas>>fillShape: "
@@ -30,6 +50,27 @@ AthensGradientPaint >> athensFillRectangle: aRect on: canvas [
 	| fill |
 	fill := self convertGradientToPaintOn: canvas.
 	fill athensFillRectangle: aRect on: canvas
+]
+
+{ #category : 'private' }
+AthensGradientPaint >> convertGradientToPaintOn2: aCanvas [
+
+	"This is a terminal method in rendering dispatch scheme
+	canvas->shape->paint. See AthensCanvas>>fillShape: "
+
+	^ gradient radial
+		  ifTrue: [
+			  aCanvas surface
+				  createRadialGradient2: gradient colorRamp
+				  center:
+				  (aCanvas pathTransform inverseTransform: gradient origin)
+				  radius: gradient direction y ]
+		  ifFalse: [
+			  aCanvas surface
+				  createLinearGradient2: gradient colorRamp
+				  start: (aCanvas pathTransform inverseTransform: gradient origin)
+				  stop: (aCanvas pathTransform inverseTransform:
+						   gradient origin + gradient direction) ]
 ]
 
 { #category : 'private' }
